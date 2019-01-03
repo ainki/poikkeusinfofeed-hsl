@@ -16,7 +16,7 @@ require('console-stamp')(console, 'HH:MM:ss'); //Aikaleimat logiin
 // Ajastimet
 
 var j = schedule.scheduleJob('1 * * * * *', function () {
-  poikkeuscheck()
+  poikkeuscheck(1)
 })
 
 var j = schedule.scheduleJob('30 1 * * * *', function () {
@@ -25,7 +25,7 @@ var j = schedule.scheduleJob('30 1 * * * *', function () {
 
 // Functions
 
-function poikkeuscheck() {
+function poikkeuscheck(moodi) {
 
   //graphQL hakulause
   const query = `{
@@ -36,7 +36,7 @@ function poikkeuscheck() {
         mode
       }
       }
-}`
+  }`
 
   return request(digiAPI, query)
     .then(function (data) {
@@ -45,43 +45,50 @@ function poikkeuscheck() {
       var alerts = jp.query(data, '$..alertDescriptionText')
       var modes = jp.query(data, '$..mode')
 
-      console.log("[info] Haetaan poikkeuksia")
+      // console.log("[info] Haetaan poikkeuksia")
 
       // Käy läpi jokaisen alertin
       for (i = 0; i < alerts.length; i += 1) {
         alert = alerts[i]
         mode = modes[i]
         if (poikkeukset.indexOf(alert) === -1) {
-          // console.log("[info] Uusi poikkeus.")
+          console.log("[info]  Uusi poikkeus: " + alert)
           poikkeukset.push(alert)
           var viesti
+          // Lyhennetään viestejä
           alert = alert.replace('Lähijunat: ', '')
           alert = alert.replace('Lähijuna ', '')
           alert = alert.replace('Helsingin sisäisen liikenteen linja ', '')
           alert = alert.replace('Espoon sisäisen liikenteen linja ', '')
           alert = alert.replace('Vantaan sisäisen liikenteen linja ', '')
           alert = alert.replace('Keravan sisäisen liikenteen linja ', '')
+          alert = alert.replace('Kirkkonummen sisäisen liikenteen linja ', '')
+          alert = alert.replace('Seutuliikenteen linja ', '')
+          alert = alert.replace('Seutuliikenteen linjat ', '')
           alert = alert.replace('Raitiolinja ', '')
           alert = alert.replace('Raitiolinjat: ', '')
+          alert = alert.replace('Metro ', '')
 
+          // Viestin alkuun merkki
           if (mode == "BUS") {
             viesti = "Ⓑ " + alert
           } else if (mode == "SUBWAY") {
             viesti = "Ⓜ " + alert
           } else if (mode == "TRAM") {
             viesti = "Ⓡ " + alert
-          } else if (mode == "TRAIN") {
+          } else if (mode == "RAIL") {
             viesti = "Ⓙ " + alert
           } else if (mode == "FERRY") {
             viesti = "Ⓛ " + alert
           } else {
             viesti = alert
           }
-
-          bot.sendMessage(channelID, viesti)
+          // Jos ei ensinmäinen haku
+          if (moodi == 1) {
+            bot.sendMessage(channelID, viesti)
+          }
         } else {
-          // Älä tee mitään
-          //console.log("[info] Vanha poikkeus.")
+          // Älä tee mitään - Vanha poikkeus
         }
       }
       // console.log(poikkeukset)
@@ -104,6 +111,7 @@ function historycheck() {
         var poikkeus = poikkeukset[i];
         // Jos API:sta ei löydy enään poikkeusta se poistetaa poikkeuksista
         if (alerts.indexOf(poikkeus) === -1) {
+          console.log("[info]  Poistetaan historiasta: " + poikkeus)
           poikkeukset.splice(i, 1)
         } else {
           // Älä tee mitään
@@ -111,3 +119,6 @@ function historycheck() {
       }
     })
 }
+
+// Käynnistyshaku (ei lähetä viestejä)
+poikkeuscheck()
