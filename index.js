@@ -19,7 +19,7 @@ var j = schedule.scheduleJob('1 * * * * *', function () {
   poikkeuscheck(1)
 })
 
-var j = schedule.scheduleJob('30 1 * * * *', function () {
+var j = schedule.scheduleJob('15 1 * * * *', function () {
   historycheck()
 })
 
@@ -56,15 +56,20 @@ function poikkeuscheck(moodi) {
           poikkeukset.push(alert)
           var viesti
           // Lyhennetään viestejä
-          alert = alert.replace('Lähijunat: ', '')
           alert = alert.replace('Lähijuna ', '')
+          alert = alert.replace('Lähijunat: ', '')
           alert = alert.replace('Helsingin sisäisen liikenteen linja ', '')
+          alert = alert.replace('Helsingin sisäisen liikenteen linjat: ', '')
           alert = alert.replace('Espoon sisäisen liikenteen linja ', '')
+          alert = alert.replace('Espoon sisäisen liikenteen linjat: ', '')
           alert = alert.replace('Vantaan sisäisen liikenteen linja ', '')
+          alert = alert.replace('Vantaan sisäisen liikenteen linjat: ', '')
           alert = alert.replace('Keravan sisäisen liikenteen linja ', '')
+          alert = alert.replace('Keravan sisäisen liikenteen linjat: ', '')
           alert = alert.replace('Kirkkonummen sisäisen liikenteen linja ', '')
+          alert = alert.replace('Kirkkonummen sisäisen liikenteen linjat:', '')
           alert = alert.replace('Seutuliikenteen linja ', '')
-          alert = alert.replace('Seutuliikenteen linjat ', '')
+          alert = alert.replace('Seutuliikenteen linjat: ', '')
           alert = alert.replace('Raitiolinja ', '')
           alert = alert.replace('Raitiolinjat: ', '')
           alert = alert.replace('Metro ', '')
